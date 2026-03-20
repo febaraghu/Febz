@@ -31,7 +31,7 @@ ROOT_URLCONF = 'febzcouture.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],   # ✅ FIXED
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
