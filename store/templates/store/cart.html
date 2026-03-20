@@ -1,0 +1,113 @@
+{% extends 'store/base.html' %}
+{% load static %}
+{% block title %}Cart — Febz Couture{% endblock %}
+{% block extra_css %}
+<style>
+.page-banner { padding: 60px 0 40px; background: linear-gradient(180deg, var(--dark-2), var(--obsidian)); border-bottom: 1px solid var(--border-dim); }
+.page-banner h1 { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 400; color: var(--cream); }
+.page-banner h1 em { font-style: italic; color: var(--gold); }
+.cart-layout { display: grid; grid-template-columns: 1fr 360px; gap: 40px; padding: 56px 0 100px; align-items: start; }
+.cart-table { background: var(--dark-2); border: 1px solid var(--border-dim); }
+.cart-thead { display: grid; grid-template-columns: 90px 1fr 130px 130px 50px; gap: 16px; padding: 16px 24px; border-bottom: 1px solid var(--border-dim); font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--cream-dim); }
+.cart-row { display: grid; grid-template-columns: 90px 1fr 130px 130px 50px; gap: 16px; padding: 22px 24px; border-bottom: 1px solid var(--border-dim); align-items: center; }
+.cart-row:last-child { border-bottom: none; }
+.cart-img { width: 90px; height: 112px; object-fit: cover; border: 1px solid var(--border-dim); display: block; }
+.cart-img-ph { width: 90px; height: 112px; background: var(--dark-3); border: 1px solid var(--border-dim); display: flex; align-items: center; justify-content: center; color: var(--dark-4); }
+.cart-product-name { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--cream); margin-bottom: 4px; }
+.cart-product-size { font-size: 10px; letter-spacing: 1px; color: var(--cream-dim); }
+.cart-price { font-size: 18px; color: var(--gold); font-family: 'Playfair Display', serif; }
+.qty-ctrl { display: flex; border: 1px solid var(--border-dim); width: fit-content; }
+.qty-ctrl button { width: 36px; height: 42px; background: var(--dark-3); border: none; color: var(--cream); font-size: 16px; cursor: none; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+.qty-ctrl button:hover { background: var(--dark-4); color: var(--gold); }
+.qty-ctrl input { width: 56px; background: var(--dark-2); border: none; border-left: 1px solid var(--border-dim); border-right: 1px solid var(--border-dim); color: var(--cream); text-align: center; font-family: 'Jost', sans-serif; font-size: 14px; outline: none; }
+.remove-btn { color: var(--cream-dim); text-decoration: none; font-size: 15px; transition: color 0.3s; display: flex; align-items: center; justify-content: center; }
+.remove-btn:hover { color: #c94c4c; }
+.cart-summary { background: var(--dark-2); border: 1px solid var(--border-dim); padding: 36px; position: sticky; top: 96px; }
+.summary-h { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border-dim); }
+.sum-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
+.sum-row span:first-child { color: var(--cream-dim); }
+.sum-total { display: flex; justify-content: space-between; align-items: baseline; padding: 20px 0 0; margin-top: 12px; border-top: 1px solid var(--border-dim); }
+.sum-total span:first-child { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--cream-dim); }
+.sum-total-price { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--gold); }
+.free-ship { background: rgba(76,201,122,0.08); border: 1px solid rgba(76,201,122,0.2); padding: 12px; font-size: 12px; color: #4cc97a; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.empty-cart { text-align: center; padding: 80px; }
+.empty-cart i { font-size: 60px; color: var(--dark-4); margin-bottom: 24px; display: block; }
+.empty-cart h2 { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--cream); margin-bottom: 12px; }
+.empty-cart p { font-size: 13px; color: var(--cream-dim); margin-bottom: 32px; }
+@media (max-width: 1024px) { .cart-layout { grid-template-columns: 1fr; } .cart-thead { display: none; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-banner">
+  <div class="container">
+    <div class="section-eyebrow">Review Your</div>
+    <h1>Shopping <em>Bag</em></h1>
+  </div>
+</div>
+<div class="container">
+  <div class="cart-layout">
+    <div>
+      {% if cart %}
+      <div class="cart-table">
+        <div class="cart-thead"><span></span><span>Product</span><span>Price</span><span>Quantity</span><span></span></div>
+        {% for key, item in cart.items %}
+        <div class="cart-row">
+          {% if item.image %}<img src="{{ item.image }}" class="cart-img" alt="{{ item.name }}">{% else %}<div class="cart-img-ph"><i class="fas fa-tshirt"></i></div>{% endif %}
+          <div>
+            <div class="cart-product-name">{{ item.name }}</div>
+            {% if item.size %}<div class="cart-product-size">Size: {{ item.size }}</div>{% endif %}
+          </div>
+          <div class="cart-price">₹{{ item.price }}</div>
+          <form method="post" action="{% url 'update_cart' key %}">
+            {% csrf_token %}
+            <div class="qty-ctrl">
+              <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}">−</button>
+              <input type="number" name="quantity" value="{{ item.quantity }}" min="0" onchange="this.form.submit()">
+              <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}">+</button>
+            </div>
+          </form>
+          <a href="{% url 'remove_from_cart' key %}" class="remove-btn"><i class="fas fa-trash"></i></a>
+        </div>
+        {% endfor %}
+      </div>
+      <div style="margin-top:20px;">
+        <a href="{% url 'shop' %}" class="btn-ghost"><i class="fas fa-arrow-left"></i> <span>Continue Shopping</span></a>
+      </div>
+      {% else %}
+      <div class="empty-cart">
+        <i class="fas fa-shopping-bag"></i>
+        <h2>Your Bag is Empty</h2>
+        <p>Discover our beautiful couture collections!</p>
+        <a href="{% url 'shop' %}" class="btn-gold">Shop Now</a>
+      </div>
+      {% endif %}
+    </div>
+    {% if cart %}
+    <div class="cart-summary">
+      <div class="summary-h">Order Summary</div>
+      {% for key, item in cart.items %}
+      <div class="sum-row">
+        <span>{{ item.name }} × {{ item.quantity }}</span>
+        <span style="color:var(--cream);">₹{{ item.price }}</span>
+      </div>
+      {% endfor %}
+      {% if total >= 999 %}
+      <div class="free-ship"><i class="fas fa-truck"></i> Free shipping applied!</div>
+      {% else %}
+      <div class="sum-row"><span>Shipping</span><span style="color:var(--cream);">₹99</span></div>
+      {% endif %}
+      <div class="sum-total">
+        <span>Total</span>
+        <span class="sum-total-price">₹{{ total|floatformat:0 }}</span>
+      </div>
+      <a href="{% url 'checkout' %}" class="btn-gold" style="width:100%;justify-content:center;margin-top:24px;padding:17px;">
+        Checkout <i class="fas fa-arrow-right"></i>
+      </a>
+      <div style="text-align:center;margin-top:16px;font-size:10px;color:var(--cream-dim);letter-spacing:0.5px;">
+        <i class="fas fa-lock" style="color:var(--gold);margin-right:6px;"></i>Secure & encrypted checkout
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

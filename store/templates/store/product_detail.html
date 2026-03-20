@@ -1,0 +1,145 @@
+{% extends 'store/base.html' %}
+{% load static %}
+{% block title %}{{ product.name }} — Febz Couture{% endblock %}
+
+{% block extra_css %}
+<style>
+.pd-section { padding: 60px 0 100px; }
+.pd-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 72px; align-items: start; }
+
+/* GALLERY */
+.pd-gallery { position: sticky; top: 96px; }
+.pd-main-img {
+  width: 100%; aspect-ratio: 3/4; overflow: hidden;
+  background: var(--dark-2); border: 1px solid var(--border-dim);
+  position: relative; margin-bottom: 14px;
+  cursor: zoom-in;
+}
+.pd-main-img img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.6s var(--transition);
+}
+.pd-main-img:hover img { transform: scale(1.04); }
+
+/* 🔥 ARROWS */
+.pd-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--border);
+  color: white;
+  font-size: 22px;
+  width: 40px;
+  height: 50px;
+  cursor: pointer;
+  z-index: 5;
+}
+.pd-arrow.left { left: 10px; }
+.pd-arrow.right { right: 10px; }
+.pd-arrow:hover { background: var(--gold); color: black; }
+
+.pd-main-img .pd-zoom-hint {
+  position: absolute; bottom: 16px; right: 16px;
+  background: rgba(6,7,9,0.7); border: 1px solid var(--border);
+  padding: 8px 12px; font-size: 9px; letter-spacing: 2px;
+  color: var(--cream-dim); backdrop-filter: blur(10px);
+  opacity: 0; transition: opacity 0.3s;
+}
+.pd-main-img:hover .pd-zoom-hint { opacity: 1; }
+
+.pd-thumbs { display: flex; gap: 10px; }
+.pd-thumb {
+  width: 76px; height: 96px; overflow: hidden;
+  border: 1px solid var(--border-dim); cursor: none;
+  transition: all 0.3s; flex-shrink: 0;
+}
+.pd-thumb:hover, .pd-thumb.active { border-color: var(--gold); }
+.pd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* KEEP ALL YOUR OTHER CSS SAME */
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container pd-section">
+  <div class="pd-grid">
+
+    <!-- GALLERY -->
+    <div class="pd-gallery">
+      <div class="pd-main-img" id="mainImg">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" id="mainImgEl">
+        {% else %}
+        <div class="pc-no-img" style="height:100%;"><i class="fas fa-tshirt"></i></div>
+        {% endif %}
+
+        <!-- 🔥 ARROWS -->
+        <button type="button" class="pd-arrow left" onclick="prevImg()">❮</button>
+        <button type="button" class="pd-arrow right" onclick="nextImg()">❯</button>
+
+        <div class="pd-zoom-hint">
+          <i class="fas fa-search-plus" style="margin-right:6px;"></i>Hover to zoom
+        </div>
+      </div>
+
+      <div class="pd-thumbs">
+        {% if product.image %}
+        <div class="pd-thumb active" onclick="switchImg('{{ product.image.url }}', this)">
+          <img src="{{ product.image.url }}">
+        </div>
+        {% endif %}
+        {% if product.image2 %}
+        <div class="pd-thumb" onclick="switchImg('{{ product.image2.url }}', this)">
+          <img src="{{ product.image2.url }}">
+        </div>
+        {% endif %}
+        {% if product.image3 %}
+        <div class="pd-thumb" onclick="switchImg('{{ product.image3.url }}', this)">
+          <img src="{{ product.image3.url }}">
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- KEEP YOUR FULL PRODUCT INFO SECTION SAME -->
+  </div>
+</div>
+
+<script>
+let images = [
+  {% if product.image %}"{{ product.image.url }}",{% endif %}
+  {% if product.image2 %}"{{ product.image2.url }}",{% endif %}
+  {% if product.image3 %}"{{ product.image3.url }}",{% endif %}
+];
+
+let currentIndex = 0;
+
+function switchImg(url, el) {
+  document.getElementById('mainImgEl').src = url;
+  document.querySelectorAll('.pd-thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentIndex = images.indexOf(url);
+}
+
+function nextImg() {
+  if (images.length === 0) return;
+  currentIndex = (currentIndex + 1) % images.length;
+  updateMainImage();
+}
+
+function prevImg() {
+  if (images.length === 0) return;
+  currentIndex = (currentIndex - 1 + images.length) % images.length;
+  updateMainImage();
+}
+
+function updateMainImage() {
+  document.getElementById('mainImgEl').src = images[currentIndex];
+  document.querySelectorAll('.pd-thumb').forEach((t, i) => {
+    t.classList.toggle('active', i === currentIndex);
+  });
+}
+</script>
+
+{% endblock %}

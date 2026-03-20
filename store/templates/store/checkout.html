@@ -1,0 +1,119 @@
+{% extends 'store/base.html' %}
+{% load static %}
+{% block title %}Checkout — Febz Couture{% endblock %}
+{% block extra_css %}
+<style>
+.page-banner { padding: 60px 0 40px; background: linear-gradient(180deg, var(--dark-2), var(--obsidian)); border-bottom: 1px solid var(--border-dim); }
+.page-banner h1 { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 400; color: var(--cream); }
+.page-banner h1 em { font-style: italic; color: var(--gold); }
+.checkout-layout { display: grid; grid-template-columns: 1fr 380px; gap: 40px; padding: 56px 0 100px; align-items: start; }
+.form-card { background: var(--dark-2); border: 1px solid var(--border-dim); padding: 36px; margin-bottom: 24px; }
+.form-card-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-dim); display: flex; align-items: center; gap: 12px; }
+.form-card-title i { color: var(--gold); font-size: 18px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { margin-bottom: 20px; }
+.order-review { background: var(--dark-2); border: 1px solid var(--border-dim); padding: 32px; position: sticky; top: 96px; }
+.order-review-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-dim); }
+.order-item-row { display: flex; gap: 14px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border-dim); }
+.order-item-row:last-of-type { border-bottom: none; }
+.oi-img { width: 52px; height: 68px; object-fit: cover; border: 1px solid var(--border-dim); flex-shrink: 0; }
+.oi-img-ph { width: 52px; height: 68px; background: var(--dark-3); border: 1px solid var(--border-dim); display: flex; align-items: center; justify-content: center; color: var(--dark-4); flex-shrink: 0; }
+.oi-name { font-size: 13px; color: var(--cream); margin-bottom: 3px; }
+.oi-detail { font-size: 10px; color: var(--cream-dim); }
+.oi-price { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold); margin-left: auto; flex-shrink: 0; }
+.payment-note { background: rgba(201,168,76,0.05); border: 1px solid rgba(201,168,76,0.15); padding: 14px 16px; margin-bottom: 20px; font-size: 12px; color: var(--cream-dim); display: flex; align-items: center; gap: 10px; }
+.payment-note i { color: var(--gold); }
+.cod-option { display: flex; align-items: center; gap: 14px; padding: 18px; border: 1px solid var(--border); background: rgba(201,168,76,0.04); margin-bottom: 24px; cursor: none; }
+.cod-option input { accent-color: var(--gold); width: 16px; height: 16px; }
+.cod-title { font-size: 14px; font-weight: 500; color: var(--cream); display: block; }
+.cod-sub { font-size: 11px; color: var(--cream-dim); }
+@media (max-width: 1024px) { .checkout-layout { grid-template-columns: 1fr; } .order-review { position: static; } .form-row { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-banner">
+  <div class="container">
+    <div class="section-eyebrow">Almost There</div>
+    <h1>Secure <em>Checkout</em></h1>
+  </div>
+</div>
+<div class="container">
+  <div class="checkout-layout">
+    <div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-card">
+          <div class="form-card-title"><i class="fas fa-user"></i> Personal Details</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="field-label">Full Name *</label>
+              <input type="text" name="full_name" class="field-input" required placeholder="Your full name" value="{% if user.is_authenticated %}{{ user.get_full_name }}{% endif %}">
+            </div>
+            <div class="form-group">
+              <label class="field-label">Email Address *</label>
+              <input type="email" name="email" class="field-input" required placeholder="you@example.com" value="{% if user.is_authenticated %}{{ user.email }}{% endif %}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="field-label">Phone Number *</label>
+            <input type="tel" name="phone" class="field-input" required placeholder="+234 800 000 0000">
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title"><i class="fas fa-map-marker-alt"></i> Delivery Address</div>
+          <div class="form-group">
+            <label class="field-label">Street Address *</label>
+            <textarea name="address" class="field-input" rows="3" required placeholder="House number, street, landmark..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="field-label">City *</label><input type="text" name="city" class="field-input" required placeholder="City"></div>
+            <div class="form-group"><label class="field-label">State *</label><input type="text" name="state" class="field-input" required placeholder="State"></div>
+          </div>
+          <div class="form-group">
+            <label class="field-label">Postal Code *</label>
+            <input type="text" name="pincode" class="field-input" required placeholder="100001">
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title"><i class="fas fa-credit-card"></i> Payment</div>
+          <div class="payment-note"><i class="fas fa-info-circle"></i> Online payment coming soon. Currently accepting cash on delivery.</div>
+          <div class="cod-option">
+            <input type="radio" name="payment" value="cod" id="cod" checked>
+            <label for="cod">
+              <span class="cod-title">Cash on Delivery</span>
+              <span class="cod-sub">Pay when your order arrives at your door</span>
+            </label>
+          </div>
+          <button type="submit" class="btn-gold" style="width:100%;justify-content:center;padding:18px;font-size:11px;">
+            <i class="fas fa-check-circle"></i> Place Order — ₹{{ total|floatformat:0 }}
+          </button>
+          <p style="text-align:center;font-size:10px;color:var(--cream-dim);margin-top:14px;letter-spacing:0.5px;">
+            <i class="fas fa-lock" style="color:var(--gold);margin-right:6px;"></i>Your information is protected
+          </p>
+        </div>
+      </form>
+    </div>
+    <div class="order-review">
+      <div class="order-review-title">Your Order</div>
+      {% for key, item in cart.items %}
+      <div class="order-item-row">
+        {% if item.image %}<img src="{{ item.image }}" class="oi-img" alt="">{% else %}<div class="oi-img-ph"><i class="fas fa-tshirt"></i></div>{% endif %}
+        <div>
+          <div class="oi-name">{{ item.name }}</div>
+          <div class="oi-detail">{% if item.size %}Size: {{ item.size }} · {% endif %}Qty: {{ item.quantity }}</div>
+        </div>
+        <div class="oi-price">₹{{ item.price }}</div>
+      </div>
+      {% endfor %}
+      <div style="border-top:1px solid var(--border-dim);margin-top:12px;padding-top:16px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;"><span style="color:var(--cream-dim);">Subtotal</span><span>₹{{ total|floatformat:0 }}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:13px;"><span style="color:var(--cream-dim);">Shipping</span><span style="color:#4cc97a;">{% if total >= 999 %}Free{% else %}₹99{% endif %}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cream-dim);">Total</span>
+          <span style="font-family:'Playfair Display',serif;font-size:32px;color:var(--gold);">₹{{ total|floatformat:0 }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,257 @@
+{% extends 'store/base.html' %}
+{% load static %}
+{% block title %}Collection — Febz Couture{% endblock %}
+
+{% block extra_css %}
+<style>
+.shop-hero {
+  padding: 80px 0 60px;
+  background: linear-gradient(180deg, var(--dark-2) 0%, var(--obsidian) 100%);
+  border-bottom: 1px solid var(--border-dim);
+  position: relative; overflow: hidden;
+}
+.shop-hero::after {
+  content: 'SHOP';
+  position: absolute; right: -20px; top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Playfair Display', serif;
+  font-size: 200px; font-weight: 700;
+  color: rgba(201,168,76,0.03);
+  pointer-events: none;
+}
+.shop-h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 56px; font-weight: 400; line-height: 1;
+  color: var(--cream);
+}
+.shop-h1 em { font-style: italic; color: var(--gold); }
+
+/* AUDIENCE TABS */
+.audience-tabs {
+  display: flex; gap: 0; margin: 28px 0 0;
+  border-bottom: 1px solid var(--border-dim);
+}
+.audience-tab {
+  padding: 14px 28px; font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; text-decoration: none;
+  color: var(--cream-dim);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+.audience-tab:hover { color: var(--gold); }
+.audience-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* SHOP LAYOUT */
+.shop-layout {
+  display: grid; grid-template-columns: 280px 1fr;
+  gap: 48px; padding: 56px 0 100px;
+  align-items: start;
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: sticky; top: 96px;
+}
+.sidebar-block {
+  background: var(--dark-2); border: 1px solid var(--border-dim);
+  padding: 28px; margin-bottom: 20px;
+  transition: border-color 0.3s;
+}
+.sidebar-block:hover { border-color: var(--border); }
+.sidebar-block-title {
+  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 20px; font-weight: 600;
+  display: flex; align-items: center; gap: 10px;
+}
+.sidebar-block-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border-dim);
+}
+.search-wrap { position: relative; }
+.search-wrap input {
+  width: 100%;
+  background: var(--dark-3); border: 1px solid var(--border-dim);
+  border-radius: 0; color: var(--cream);
+  padding: 12px 42px 12px 14px;
+  font-family: 'Jost', sans-serif; font-size: 12px;
+  outline: none; transition: border-color 0.3s;
+}
+.search-wrap input:focus { border-color: var(--gold); }
+.search-wrap button {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--gold);
+  cursor: none; font-size: 13px;
+}
+.filter-link {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 12px; color: var(--cream-dim); text-decoration: none;
+  font-size: 12px; letter-spacing: 0.5px;
+  border-left: 2px solid transparent;
+  transition: all 0.3s; margin-bottom: 2px;
+}
+.filter-link:hover, .filter-link.active {
+  color: var(--gold); border-left-color: var(--gold);
+  background: rgba(201,168,76,0.04);
+}
+.filter-count {
+  font-size: 10px; color: var(--cream-dim);
+  background: var(--dark-3); padding: 2px 8px; border-radius: 10px;
+}
+
+/* PRODUCTS AREA */
+.shop-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 32px; padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-dim);
+}
+.results-text { font-size: 12px; color: var(--cream-dim); }
+.results-text strong { color: var(--cream); }
+.sort-sel {
+  background: var(--dark-2); border: 1px solid var(--border-dim);
+  color: var(--cream); padding: 9px 16px;
+  font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 1px;
+  outline: none; cursor: none;
+  transition: border-color 0.3s;
+}
+.sort-sel:focus { border-color: var(--gold); }
+.products-grid-3 {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+}
+.empty-state {
+  grid-column: 1 / -1; text-align: center; padding: 80px 20px;
+}
+.empty-state i { font-size: 52px; color: var(--dark-4); margin-bottom: 20px; display: block; }
+.empty-state h3 {
+  font-family: 'Playfair Display', serif; font-size: 28px; color: var(--cream);
+  margin-bottom: 10px;
+}
+.empty-state p { font-size: 13px; color: var(--cream-dim); margin-bottom: 24px; }
+
+@media (max-width: 1024px) {
+  .shop-layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+  .products-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .shop-h1 { font-size: 36px; }
+  .products-grid-3 { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="shop-hero">
+  <div class="container">
+    <div class="section-eyebrow">Febz Couture</div>
+    <h1 class="shop-h1">The <em>Collection</em></h1>
+    <div class="audience-tabs">
+      <a href="{% url 'shop' %}" class="audience-tab {% if not selected_audience %}active{% endif %}">All</a>
+      <a href="{% url 'shop' %}?audience=ladies{% if selected_category %}&category={{ selected_category }}{% endif %}" class="audience-tab {% if selected_audience == 'ladies' %}active{% endif %}">Ladies</a>
+      <a href="{% url 'shop' %}?audience=kids{% if selected_category %}&category={{ selected_category }}{% endif %}" class="audience-tab {% if selected_audience == 'kids' %}active{% endif %}">Kids</a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="shop-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">Search</div>
+        <form method="get" class="search-wrap">
+          {% if selected_audience %}<input type="hidden" name="audience" value="{{ selected_audience }}">{% endif %}
+          {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+          <input type="text" name="search" placeholder="Search styles..." value="{{ search|default:'' }}">
+          <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">Categories</div>
+        <a href="{% url 'shop' %}{% if selected_audience %}?audience={{ selected_audience }}{% endif %}"
+           class="filter-link {% if not selected_category %}active{% endif %}">
+          All Categories
+        </a>
+        {% for cat in categories %}
+        <a href="?category={{ cat.slug }}{% if selected_audience %}&audience={{ selected_audience }}{% endif %}"
+           class="filter-link {% if selected_category == cat.slug %}active{% endif %}">
+          {{ cat.name }}
+          <span class="filter-count">{{ cat.products.count }}</span>
+        </a>
+        {% endfor %}
+      </div>
+
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">Sort By</div>
+        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_audience %}audience={{ selected_audience }}&{% endif %}sort=newest{% if search %}&search={{ search }}{% endif %}"
+           class="filter-link {% if sort == 'newest' %}active{% endif %}">Newest First</a>
+        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_audience %}audience={{ selected_audience }}&{% endif %}sort=price_low{% if search %}&search={{ search }}{% endif %}"
+           class="filter-link {% if sort == 'price_low' %}active{% endif %}">Price: Low → High</a>
+        <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_audience %}audience={{ selected_audience }}&{% endif %}sort=price_high{% if search %}&search={{ search }}{% endif %}"
+           class="filter-link {% if sort == 'price_high' %}active{% endif %}">Price: High → Low</a>
+      </div>
+
+      {% if selected_category or selected_audience or search %}
+      <a href="{% url 'shop' %}" style="display:block;text-align:center;padding:12px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cream-dim);text-decoration:none;border:1px solid var(--border-dim);transition:all 0.3s;" onmouseover="this.style.color='var(--gold)';this.style.borderColor='var(--gold)'" onmouseout="this.style.color='var(--cream-dim)';this.style.borderColor='var(--border-dim)'">
+        <i class="fas fa-times" style="margin-right:8px;"></i>Clear All Filters
+      </a>
+      {% endif %}
+    </aside>
+
+    <!-- PRODUCTS -->
+    <div>
+      <div class="shop-toolbar">
+        <div class="results-text">
+          <strong>{{ products.count }}</strong> products
+          {% if search %} for "<strong>{{ search }}</strong>"{% endif %}
+        </div>
+      </div>
+
+      <div class="products-grid-3">
+        {% for product in products %}
+        <div class="product-card reveal reveal-delay-{{ forloop.counter|add:'0' }}">
+          <div class="pc-image">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+            {% else %}
+            <div class="pc-no-img"><i class="fas fa-tshirt"></i></div>
+            {% endif %}
+            {% if product.is_new_arrival %}<div class="pc-badge new">New</div>{% endif %}
+            {% if product.discount_percent > 0 %}<div class="pc-badge">-{{ product.discount_percent }}%</div>{% endif %}
+            <div class="pc-actions">
+              <a href="{% url 'product_detail' product.slug %}" class="btn-ghost" style="flex:1;justify-content:center;padding:11px 0;font-size:9px;"><span>View</span></a>
+              <form method="post" action="{% url 'add_to_cart' product.id %}" style="flex:1;">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="btn-gold" style="width:100%;justify-content:center;padding:11px 0;font-size:9px;">
+                  <i class="fas fa-bag-shopping"></i> Add
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="pc-category">{{ product.category.name }}</div>
+            <div class="pc-name">
+              <a href="{% url 'product_detail' product.slug %}" style="color:inherit;text-decoration:none;">{{ product.name }}</a>
+            </div>
+            <div class="pc-price">
+              <span class="pc-price-current">₹{{ product.price }}</span>
+              {% if product.original_price %}<span class="pc-price-was">₹{{ product.original_price }}</span>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+          <i class="fas fa-search"></i>
+          <h3>No Styles Found</h3>
+          <p>Try different filters or browse the full collection</p>
+          <a href="{% url 'shop' %}" class="btn-gold">Browse All</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

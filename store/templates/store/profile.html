@@ -1,0 +1,234 @@
+{% extends 'store/base.html' %}
+{% load static %}
+{% block title %}My Account — Febz Couture{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-banner { padding: 60px 0 40px; background: linear-gradient(180deg, var(--dark-2), var(--obsidian)); border-bottom: 1px solid var(--border-dim); }
+.page-banner h1 { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 400; color: var(--cream); }
+.page-banner h1 em { font-style: italic; color: var(--gold); }
+
+.profile-layout {
+  display: grid; grid-template-columns: 280px 1fr;
+  gap: 40px; padding: 56px 0 100px; align-items: start;
+}
+.profile-sidebar {
+  background: var(--dark-2); border: 1px solid var(--border-dim);
+  padding: 36px 28px; position: sticky; top: 96px;
+}
+.profile-avatar-wrap {
+  text-align: center; margin-bottom: 24px;
+  padding-bottom: 24px; border-bottom: 1px solid var(--border-dim);
+}
+.profile-avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(201,168,76,0.08); border: 2px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; color: var(--gold); margin: 0 auto 14px;
+}
+.profile-username {
+  font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 4px;
+}
+.profile-email { font-size: 11px; color: var(--cream-dim); letter-spacing: 0.5px; }
+
+.profile-nav { list-style: none; }
+.profile-nav li { margin-bottom: 2px; }
+.profile-nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; color: var(--cream-dim); text-decoration: none;
+  font-size: 12px; letter-spacing: 0.5px;
+  border-left: 2px solid transparent;
+  transition: all 0.3s;
+}
+.profile-nav a i { width: 16px; text-align: center; color: var(--cream-dim); transition: color 0.3s; }
+.profile-nav a:hover, .profile-nav a.active {
+  color: var(--gold); border-left-color: var(--gold);
+  background: rgba(201,168,76,0.04);
+}
+.profile-nav a:hover i, .profile-nav a.active i { color: var(--gold); }
+
+/* Content cards */
+.content-card {
+  background: var(--dark-2); border: 1px solid var(--border-dim);
+  margin-bottom: 24px; transition: border-color 0.3s;
+}
+.content-card:hover { border-color: var(--border); }
+.card-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 28px; border-bottom: 1px solid var(--border-dim);
+}
+.card-head h2 {
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; color: var(--cream);
+  display: flex; align-items: center; gap: 12px;
+}
+.card-head h2 i { color: var(--gold); font-size: 18px; }
+.card-count { font-size: 10px; color: var(--cream-dim); letter-spacing: 1px; }
+
+/* Order card */
+.order-card {
+  padding: 24px 28px; border-bottom: 1px solid var(--border-dim);
+  transition: background 0.3s;
+}
+.order-card:last-child { border-bottom: none; }
+.order-card:hover { background: rgba(201,168,76,0.02); }
+.order-top {
+  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;
+}
+.order-num {
+  font-family: 'Playfair Display', serif; font-size: 18px; color: var(--cream); margin-bottom: 3px;
+}
+.order-date { font-size: 10px; color: var(--cream-dim); letter-spacing: 0.5px; }
+.status-pill {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 20px;
+}
+.status-pending { background: rgba(201,168,76,0.12); color: var(--gold); }
+.status-confirmed { background: rgba(76,201,122,0.12); color: #4cc97a; }
+.status-delivered { background: rgba(76,201,122,0.12); color: #4cc97a; }
+.status-shipped { background: rgba(100,160,255,0.12); color: #64a0ff; }
+.status-cancelled { background: rgba(201,76,76,0.12); color: #c94c4c; }
+.status-processing { background: rgba(201,168,76,0.12); color: var(--gold); }
+.order-items { font-size: 12px; color: var(--cream-dim); margin-bottom: 12px; }
+.order-footer { display: flex; justify-content: space-between; align-items: center; }
+.order-total {
+  font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold);
+}
+.order-addr { font-size: 11px; color: var(--cream-dim); }
+
+/* Wishlist grid */
+.wishlist-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 24px 28px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 60px 40px;
+}
+.empty-state i { font-size: 44px; color: var(--dark-4); margin-bottom: 18px; display: block; }
+.empty-state h3 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--cream); margin-bottom: 8px; }
+.empty-state p { font-size: 13px; color: var(--cream-dim); margin-bottom: 24px; }
+
+@media (max-width: 1024px) {
+  .profile-layout { grid-template-columns: 1fr; }
+  .profile-sidebar { position: static; }
+  .wishlist-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+  <div class="container">
+    <div class="section-eyebrow">Welcome Back</div>
+    <h1>My <em>Account</em></h1>
+  </div>
+</div>
+
+<div class="container">
+  <div class="profile-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="profile-sidebar">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar"><i class="fas fa-user"></i></div>
+        <div class="profile-username">{{ user.username }}</div>
+        <div class="profile-email">{{ user.email }}</div>
+      </div>
+      <ul class="profile-nav">
+        <li><a href="#orders" class="active"><i class="fas fa-shopping-bag"></i> My Orders</a></li>
+        <li><a href="#wishlist"><i class="fas fa-heart"></i> Wishlist</a></li>
+        <li><a href="{% url 'shop' %}"><i class="fas fa-store"></i> Shop Collection</a></li>
+        <li>
+          <a href="{% url 'logout' %}" style="color:var(--cream-dim);">
+            <i class="fas fa-sign-out-alt"></i> Sign Out
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- CONTENT -->
+    <div>
+
+      <!-- ORDERS -->
+      <div class="content-card" id="orders">
+        <div class="card-head">
+          <h2><i class="fas fa-shopping-bag"></i> My Orders</h2>
+          <span class="card-count">{{ orders.count }} order{{ orders.count|pluralize }}</span>
+        </div>
+        {% for order in orders %}
+        <div class="order-card">
+          <div class="order-top">
+            <div>
+              <div class="order-num">#FC-{{ order.id|stringformat:"05d" }}</div>
+              <div class="order-date">{{ order.created_at|date:"d M Y · H:i" }}</div>
+            </div>
+            <span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span>
+          </div>
+          <div class="order-items">
+            {% for item in order.items.all %}{{ item.product_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          </div>
+          <div class="order-footer">
+            <span class="order-total">₹{{ order.total_amount }}</span>
+            <span class="order-addr"><i class="fas fa-map-marker-alt" style="margin-right:5px;color:var(--gold);"></i>{{ order.city }}, {{ order.state }}</span>
+          </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+          <i class="fas fa-shopping-bag"></i>
+          <h3>No Orders Yet</h3>
+          <p>Your fashion journey is about to begin!</p>
+          <a href="{% url 'shop' %}" class="btn-gold">Explore Collection</a>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- WISHLIST -->
+      <div class="content-card" id="wishlist">
+        <div class="card-head">
+          <h2><i class="fas fa-heart"></i> My Wishlist</h2>
+          <span class="card-count">{{ wishlist.count }} item{{ wishlist.count|pluralize }}</span>
+        </div>
+        {% if wishlist %}
+        <div class="wishlist-grid">
+          {% for item in wishlist %}
+          <div class="product-card">
+            <div class="pc-image" style="aspect-ratio:3/4;">
+              {% if item.product.image %}
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" loading="lazy">
+              {% else %}
+              <div class="pc-no-img"><i class="fas fa-tshirt"></i></div>
+              {% endif %}
+              <div class="pc-actions">
+                <a href="{% url 'product_detail' item.product.slug %}" class="btn-gold" style="flex:1;justify-content:center;padding:10px;font-size:9px;">View</a>
+              </div>
+            </div>
+            <div class="pc-body">
+              <div class="pc-name" style="font-size:14px;">
+                <a href="{% url 'product_detail' item.product.slug %}" style="color:inherit;text-decoration:none;">{{ item.product.name }}</a>
+              </div>
+              <div class="pc-price">
+                <span class="pc-price-current">₹{{ item.product.price }}</span>
+              </div>
+              <a href="{% url 'toggle_wishlist' item.product.id %}"
+                 style="display:block;margin-top:10px;font-size:10px;letter-spacing:1px;color:#c94c4c;text-decoration:none;transition:opacity 0.2s;"
+                 onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                <i class="fas fa-times" style="margin-right:6px;"></i>Remove
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="fas fa-heart"></i>
+          <h3>Wishlist is Empty</h3>
+          <p>Save your favourite pieces here!</p>
+          <a href="{% url 'shop' %}" class="btn-ghost"><span>Browse Collection</span></a>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
